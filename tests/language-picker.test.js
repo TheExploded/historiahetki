@@ -1,0 +1,10 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const app=fs.readFileSync('app.js','utf8');
+const source=app.slice(app.indexOf('function selector()'),app.indexOf('\nfunction shell()'));
+const root={innerHTML:''},storage={},buttons=[];
+const scope={UI:Object.fromEntries(['fa','ar','fr','uk','so','sw','en','fi'].map(k=>[k,{name:k}])),language:'',localStorage:{getItem:()=>'',setItem:(k,v)=>storage[k]=v},$:()=>root,esc:x=>x,document:{querySelectorAll:()=>buttons},render:()=>scope.rendered=true};
+vm.createContext(scope);vm.runInContext(source,scope);scope.selector();
+for(const code of Object.keys(scope.UI))assert.ok(root.innerHTML.includes(`data-language="${code}"`),`Missing ${code} button`);
+assert.ok(root.innerHTML.includes('language-flag'),'Flags missing');
+assert.ok(!root.innerHTML.includes('<select'),'Picker should use direct selection buttons');
+console.log('Eight flag buttons replace the opening dropdown');
