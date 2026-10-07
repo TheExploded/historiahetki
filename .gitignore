@@ -1,0 +1,4 @@
+.serena/
+.DS_Store
+node_modules/
+artifacts/
